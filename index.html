@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+<script type="text/javascript" charset="utf-8">
+    function dragOverHandler(e) {
+        e.preventDefault();
+    }
+
+    function dropHandler(e) {
+        e.preventDefault();
+        if (e.dataTransfer.items) {
+            for (var i = 0; i < e.dataTransfer.items.length; i++) {
+                if (e.dataTransfer.items[i].kind === 'file') {
+                    var file = e.dataTransfer.items[i].getAsFile();
+                    alert(file.path);
+                }
+            }
+        } else {
+            for (var i = 0; i < e.dataTransfer.files.length; i++) {
+                alert(e.dataTransfer.files[i].path);
+            }
+        }
+    }
+</script>
+</body>
+</html>
