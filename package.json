@@ -1,0 +1,52 @@
+{
+  "name": "video-size-reducer",
+  "version": "0.1.0",
+  "description": "Simple File Reducer",
+  "main": "index.js",
+  "scripts": {
+    "dist": "electron-builder",
+    "run": "electron index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/04SeoHyun/video-size-reducer.git"
+  },
+  "author": "Seo_Hyun <04seohyun@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/04SeoHyun/video-size-reducer/issues"
+  },
+  "homepage": "https://github.com/04SeoHyun/video-size-reducer#readme",
+  "build": {
+    "productName": "video-size-reducer",
+    "appId": "youtil.video.reducer",
+    "artifactName": "Video_Size_Reducer.${ext}",
+    "directories": {
+      "output": "build"
+    },
+    "win": {
+      "extraFiles": [
+        "./logo.ico"
+      ],
+      "target": [
+        {
+          "target": "NSIS",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "./logo.ico"
+    },
+    "nsis": {
+      "createStartMenuShortcut": true
+    }
+  },
+  "dependencies": {
+    
+  },
+  "devDependencies": {
+    "electron": "8.2.0",
+    "electron-builder": "22.4.1"
+  }
+}
