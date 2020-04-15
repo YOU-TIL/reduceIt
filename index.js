@@ -3,6 +3,13 @@ const {app, BrowserWindow, Tray, ipcMain, nativeImage} = require('electron');
 const trayImage = nativeImage.createFromPath(`${__dirname}\\logo.ico`);
 let win = null, tray = null;
 
+function getFramePath(resName) {
+    let locale = app.getLocale();
+    let supportedLanguage = ['ko'];
+    if (!supportedLanguage.includes(locale)) locale = 'ko';
+    return `file://${__dirname}/frame.html?locale=${locale}&resName=${resName}.html`;
+}
+
 function createWindow() {
     if (win) return;
     win = new BrowserWindow({
@@ -11,9 +18,10 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true
         },
-        icon: `${__dirname}\\logo.ico`
+        icon: `${__dirname}\\logo.ico`,
+        frame: false
     });
-    win.loadURL(`file://${__dirname}/index.html`);
+    win.loadURL(getFramePath());
     //win.webContents.openDevTools();
     win.setMenu(null);
     win.on('closed', () => {

@@ -43,7 +43,7 @@
     }
   },
   "dependencies": {
-    
+    "electron-settings": "^3.2.0"
   },
   "devDependencies": {
     "electron": "8.2.0",

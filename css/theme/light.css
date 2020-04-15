@@ -1,0 +1,33 @@
+#titlebar {
+    background: #827397;
+    color: #FFF;
+}
+
+body {
+    font-family: "Segoe UI", sans-serif;
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #827397;
+}
+
+::-webkit-scrollbar {
+    width: 0;
+}
+
+.card:hover {
+    background: #dddddd;
+    transition: all .3s;
+}
+
+a {
+    color: black;
+}
+
+.slider:before {
+    background-color: #ffffff;
+}
+
+.form__field {
+    color: #333333;
+    border-bottom: 1px solid #333333;
+}
