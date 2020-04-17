@@ -4,22 +4,42 @@
 <div id="dropCont" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
 </div>
 <script type="text/javascript" charset="utf-8">
+    let uProg = 0;
+    const {spawn} = require('child_process');
+
     function dragOverHandler(e) {
         e.preventDefault();
     }
 
+    function mainProc(i, fName) {
+        setTimeout(() => {
+            document.getElementById('p' + i).querySelector('div').style.width = '50%';
+            proc = spawn('ffmpeg.exe', ['-hwaccel', 'auto', '-i', fName, '-c:s', 'copy', 'C:\\webt\\test.mp4', '-y']);
+            proc.stdout.on('data', (data) => {
+                console.log(data.toString());
+            });
+            proc.stderr.on('data', (data) => {
+                if(data.toString().indexOf('Error')>-1) showToast('영상 처리중 오류가 발생했습니다.');
+                console.log(data.toString());
+            });
+            setTimeout(() => {
+                document.getElementById('p' + i).querySelector('div').style.width = '100%';
+            }, 3000);
+        }, 0);
+    }
+
     function dropHandler(e) {
         e.preventDefault();
-        if (e.dataTransfer.items) {
-            for (var i = 0; i < e.dataTransfer.items.length; i++) {
-                if (e.dataTransfer.items[i].kind === 'file') {
-                    var file = e.dataTransfer.items[i].getAsFile();
-                    dropCont.innerHTML+=`<div class="card">${file.path}</div>`;
+        for (let i = 0; i < e.dataTransfer.items.length; i++) {
+            if (e.dataTransfer.items[i].kind === 'file') {
+                const file = e.dataTransfer.items[i].getAsFile();
+                if (file.type.substring(0, 5) !== 'video') {
+                    showToast('동영상 파일이 아닙니다.');
+                    continue;
                 }
-            }
-        } else {
-            for (var i = 0; i < e.dataTransfer.files.length; i++) {
-                dropCont.innerHTML+=`<div class="card">${e.dataTransfer.files[i].path}</div>`;
+                dropCont.innerHTML += `<div class="card"><h2 class="title">${file.path}</h2><div class="prog" id="p${uProg}"><div></div></div></div>`;
+                mainProc(uProg, file.path);
+                uProg++;
             }
         }
     }

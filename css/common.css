@@ -1,0 +1,13 @@
+#toast {
+    position: fixed;
+    z-index: 1;
+    top: 100%;
+    background: #555555;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    width: 80%;
+    left: 10%;
+    height: 40px;
+    border-radius: 10px 10px 0 0;
+    padding: 10px;
+    transition: margin-top .2s cubic-bezier(.74,0,.24,1);
+}

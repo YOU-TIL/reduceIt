@@ -22,7 +22,7 @@ function createWindow() {
         frame: false
     });
     win.loadURL(getFramePath());
-    //win.webContents.openDevTools();
+    win.webContents.openDevTools();
     win.setMenu(null);
     win.on('closed', () => {
         win = null;

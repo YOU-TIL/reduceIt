@@ -3,6 +3,7 @@
 <head>
     <title>Video Size Reducer</title>
     <link href="./css/frameLess.css" rel="stylesheet" type="text/css">
+    <link href="./css/common.css" rel="stylesheet" type="text/css">
     <link href="./css/card.css" rel="stylesheet" type="text/css">
     <link href="./css/page/index.html.css" rel="stylesheet" type="text/css">
     <link id="theme" rel="stylesheet" type="text/css">
@@ -43,6 +44,8 @@
     </div>
 </div>
 <div id="scripts"></div>
+
+<div id="toast">테스트</div>
 
 <script>
     require('./js/frameLess.js');
@@ -121,6 +124,30 @@
             nowPage = html;
         }, 500);
     }
+
+    let isToastShowing = false, currentStat = 0;
+
+    function toastWorker(msg, nowStat) {
+        let delay = 0;
+        if (isToastShowing) delay = 300;
+        document.getElementById('toast').style.marginTop = '0px';
+        setTimeout(() => {
+            document.getElementById('toast').innerText = msg;
+            document.getElementById('toast').style.marginTop = '-40px';
+            isToastShowing = true;
+            setTimeout(() => {
+                if (currentStat !== nowStat) return;
+                document.getElementById('toast').style.marginTop = '0px';
+                isToastShowing = false;
+            }, 5000);
+        }, delay);
+    }
+
+    function showToast(msg) {
+        ++currentStat;
+        toastWorker(msg, currentStat);
+    }
+
 
     setTimeout(() => {
         loadHTML('index.html');
