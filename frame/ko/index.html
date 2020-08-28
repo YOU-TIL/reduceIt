@@ -2,29 +2,84 @@
 <html lang="ko">
 <body>
 <div id="dropCont" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+    <div id="menu">
+        <div class="slidecontainer">
+            <h2>비트레이트 설정</h2>
+            <input type="range" min="1" max="100" value="80" class="slider" id="bitRate">
+        </div>
+    </div>
+    <div id="lists"></div>
 </div>
 <script type="text/javascript" charset="utf-8">
-    let uProg = 0;
-    const {spawn} = require('child_process');
+    let uProg = 0, nProc = 0;
 
     function dragOverHandler(e) {
         e.preventDefault();
     }
 
-    function mainProc(i, fName) {
+    function startCurrent(i) {
+        return new Promise((resolve, reject) => {
+            let intv = setInterval(() => {
+                if (nProc === i) {
+                    clearInterval(intv);
+                    resolve(0);
+                }
+            }, 1000);
+        });
+    }
+
+    async function mainProc(i, fName) {
+        await startCurrent(i);
         setTimeout(() => {
-            document.getElementById('p' + i).querySelector('div').style.width = '50%';
-            proc = spawn('ffmpeg.exe', ['-hwaccel', 'auto', '-i', fName, '-c:s', 'copy', 'C:\\webt\\test.mp4', '-y']);
+            document.getElementById('p' + i).querySelector('div').style.width = '0';
+            let frameNo, bitrate;
+            try {
+                let info = execSync('"res/mediainfo.exe" "' + fName + '" --fullscan').toString();
+                frameNo = parseInt(info.split('Frame count')[1].match(/\d+/g));
+                bitrate = Math.floor(parseInt(info.split('bit rate')[3].match(/\d+/g)) / 100 * parseInt(document.getElementById('bitRate').value)).toString();
+            } catch (e) {
+                showToast('영상 처리중 오류가 발생했습니다.');
+                nProc++;
+                return;
+            }
+            try {
+                fs.mkdirSync(path.join(path.dirname(fName), 'res'));
+            } catch (e) {
+
+            }
+            let proc = spawn('res/ffmpeg.exe', ['-hwaccel', 'auto', '-i', fName, '-y', '-c:v', 'libx265', '-b:v', '200k', '-x265-params', 'pass=1', '-an', '-f', 'mp4', '-c:a', 'aac', '-b:a', '128k', 'NUL']);
             proc.stdout.on('data', (data) => {
                 console.log(data.toString());
             });
             proc.stderr.on('data', (data) => {
-                if(data.toString().indexOf('Error')>-1) showToast('영상 처리중 오류가 발생했습니다.');
+                if (data.toString().indexOf('Error') > -1) showToast('영상 처리중 오류가 발생했습니다.');
+                try {
+                    document.getElementById('p' + i).querySelector('div').style.width = (parseInt(data.toString().split('=')[1].match(/\d+/g)) + parseInt(data.toString().split('=')[8].match(/\d+/g))) / frameNo * 50 + '%';
+                } catch (e) {
+
+                }
                 console.log(data.toString());
+                console.log(frameNo);
             });
-            setTimeout(() => {
-                document.getElementById('p' + i).querySelector('div').style.width = '100%';
-            }, 3000);
+            proc.addListener('close', () => {
+                let proc2 = spawn('res/ffmpeg.exe', ['-hwaccel', 'auto', '-i', fName, '-y', '-c:v', 'libx265', '-b:v', '200k', '-x265-params', 'pass=2', '-c:a', 'aac', '-b:a', '128k', path.join(path.dirname(fName), 'res', path.basename(fName))]);
+                proc2.stdout.on('data', (data) => {
+                    console.log(data.toString());
+                });
+                proc2.stderr.on('data', (data) => {
+                    if (data.toString().indexOf('Error') > -1) showToast('영상 처리중 오류가 발생했습니다.');
+                    try {
+                        document.getElementById('p' + i).querySelector('div').style.width = (parseInt(data.toString().split('=')[1].match(/\d+/g)) + parseInt(data.toString().split('=')[8].match(/\d+/g))) / frameNo * 50 + 50 + '%';
+                    } catch (e) {
+
+                    }
+                    console.log(data.toString());
+                    console.log(frameNo);
+                });
+                proc2.addListener('close', () => {
+                    nProc++;
+                });
+            });
         }, 0);
     }
 
@@ -37,7 +92,7 @@
                     showToast('동영상 파일이 아닙니다.');
                     continue;
                 }
-                dropCont.innerHTML += `<div class="card"><h2 class="title">${file.path}</h2><div class="prog" id="p${uProg}"><div></div></div></div>`;
+                document.getElementById('lists').innerHTML += `<div class="card"><h2 class="title">${file.path}</h2><div class="prog" id="p${uProg}"><div></div></div></div>`;
                 mainProc(uProg, file.path);
                 uProg++;
             }
